@@ -1,0 +1,9 @@
+* fire up dev server:
+
+    ant run-dev-server
+
+* visit localhost:8080
+
+* attach to repl
+
+    ./bin/repl.sh
