@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<project name="clojure-gae" default="build">
+  <property name="sdk.dir" location="../appengine-java-sdk" />
+  <property name="gae.app.dir" location="war/WEB-INF/lib" />
+  <property name="source.dir" location="src"/>
+  <import file="${sdk.dir}/config/user/ant-macros.xml" />
+
+  <target name="init" depends="clean">
+    <mkdir dir="war/WEB-INF/classes" />
+  </target>
+
+  <target name="clean" description="Remove generated files">
+    <delete dir="war/WEB-INF/classes" />
+  </target>
+
+  <target name="copyjars"
+      description="Copies the App Engine JARs to the WAR.">
+    <copy
+        todir="war/WEB-INF/lib"
+        flatten="true">
+      <fileset dir="${sdk.dir}/lib/user">
+        <include name="**/*.jar" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" description="Compile sources" depends="init, copyjars">
+    <java classname="clojure.lang.Compile" >
+      <classpath>
+        <path location="${sdk.dir}/lib/appengine-tools-api.jar"/>
+        <path location="${source.dir}"/>
+        <path location="war/WEB-INF/classes"/>
+        <fileset dir="${gae.app.dir}">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <arg value="clojure-gae.servlet"/>
+      <sysproperty key="clojure.compile.path" value="war/WEB-INF/classes"/>
+    </java>
+  </target>
+
+  <target name="run-dev-server" depends="compile">
+    <dev_appserver war="war" port="8080" >
+      <options>
+        <arg value="--jvm_flag=-D--enable_all_permissions=true" />
+      </options>
+    </dev_appserver>
+  </target>
+</project>
